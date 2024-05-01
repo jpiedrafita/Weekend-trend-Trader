@@ -1,0 +1,9 @@
+//@version=5
+//By ChorcheRnR
+
+indicator("Resisance 20 periods", shorttitle="Res 20", overlay=true)
+
+lenght = 20
+max = ta.highest(close, lenght)
+
+plot(max, title="20 Week High", color=color.gray, linewidth=2)

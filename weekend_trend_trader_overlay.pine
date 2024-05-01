@@ -1,0 +1,32 @@
+//@version=5
+//By ChorcheRnR
+
+indicator("Weekend Trend Trader Overlay", shorttitle="WTTO", overlay=true)
+
+index_symbol = input.symbol("NASDAQ:NDX", title="Index Symbol", confirm = true)
+start_date = input.time(defval=timestamp("2024-01-01T00:00:00"), title="Start Date")
+
+// RESISTANCE
+res_lenght = 20
+res_max = ta.highest(close, res_lenght)
+plot(res_max, title="20 Week High", color=color.gray, linewidth=2)
+
+// TRAILING STOP LOSS
+// Get index trend
+index_price = request.security(index_symbol, timeframe.period, close)
+index_sma = ta.sma(index_price, 10)
+is_bullish = index_price > index_sma
+
+// Calculate stop loss from date
+var bool end = false
+var float dynamic_stop_loss = na
+if (time >= start_date) and not end
+    // Adjust stop loss to 40% for a bullish index and 10% for bearish, without backing down
+    current_stop_loss = res_max * (is_bullish ? 0.6 : 0.9)
+    dynamic_stop_loss := na(dynamic_stop_loss) or (current_stop_loss > dynamic_stop_loss) ? current_stop_loss : dynamic_stop_loss
+
+// Print stop loss only up to the crossing
+if dynamic_stop_loss > close
+    dynamic_stop_loss := na
+    end := true
+plot(not end ? dynamic_stop_loss : na, title="Trailing Stop Loss", color=color.white, style=plot.style_line)

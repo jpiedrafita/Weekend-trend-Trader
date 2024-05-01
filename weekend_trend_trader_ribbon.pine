@@ -1,0 +1,24 @@
+//@version=5
+//By ChorcheRnR
+indicator(title="Weekend Trend Trader Ribbon", shorttitle="WTTR", overlay=false)
+
+// INDEX FILTER RIBBON
+index_sym = input.symbol("NASDAQ:NDX", title="Symbol", confirm = true)
+index_len = input.int(10, title="Length")
+
+index_price = request.security(index_sym, timeframe.period, close)
+index_price_sma = ta.sma(index_price, index_len)
+
+index_ribbon_color = index_price > index_price_sma ? color.lime : color.red
+plot(series=1, color=index_ribbon_color, style=plot.style_histogram, linewidth = 10)
+
+// ROC 20 periods - 30% 
+roc_length = input.int(20, title="ROC Lenght")
+roc_threshold = input.float(30.0, title="ROC Threshold")
+
+roc_prev_price = close[roc_length]  // Price from 'roc_length' períods back
+roc = ((close - roc_prev_price) / roc_prev_price) * 100 
+
+// Plot ROC and threshold
+plot(roc, title="Rate of Change", color=color.blue, linewidth=2)
+hline(roc_threshold, "ROC 30%", color=color.orange, linestyle=hline.style_dotted)

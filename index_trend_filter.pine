@@ -1,0 +1,14 @@
+//@version=5
+//By ChorcheRnR
+
+indicator(title="Index Trend Filter", shorttitle="Index Trend Filter", overlay=false)
+
+// Index Filter Ribbon
+index_sym = input.symbol("NASDAQ:NDX", title="Symbol", confirm = true)
+index_len = input.int(10, title="Length")
+
+index_price = request.security(index_sym, timeframe.period, close)
+index_price_sma = ta.sma(index_price, index_len)
+
+index_ribbon_color = index_price > index_price_sma ? color.lime : color.red
+plot(series=1, color=index_ribbon_color, style=plot.style_histogram, linewidth = 20)
